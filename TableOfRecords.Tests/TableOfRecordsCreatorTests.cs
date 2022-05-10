@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Threading;
 using NUnit.Framework;
 using TableOfRecords.Tests.UserProfiles;
 
@@ -10,6 +12,12 @@ namespace TableOfRecords.Tests
     public class TableOfRecordsCreatorTests
     {
         private const string path = "Table.txt";
+        
+        [OneTimeSetUp]
+        public void Setup()
+        {
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+        }
 
         [Test]
         public void WriteTable_With_ProfileBasic_Class()
