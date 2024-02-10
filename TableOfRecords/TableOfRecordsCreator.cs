@@ -24,7 +24,72 @@ namespace TableOfRecords
         /// <exception cref="ArgumentException">Throw if <paramref name="collection"/> is empty.</exception>
         public static void WriteTable<T>(ICollection<T>? collection, TextWriter? writer)
         {
-            throw new NotImplementedException();
+            // Check for null arguments
+            if (collection == null)
+            {
+                throw new ArgumentNullException(nameof(collection));
+            }
+
+            if (writer == null)
+            {
+                throw new ArgumentNullException(nameof(writer));
+            }
+
+            // Check if collection is empty
+            if (collection.Count == 0)
+            {
+                throw new ArgumentException("Collection cannot be empty.", nameof(collection));
+            }
+
+            // Get public properties of type T
+            var properties = typeof(T).GetProperties();
+
+            // Determine maximum column width for each property
+            var columnWidths = new Dictionary<string, int>();
+            foreach (var property in properties)
+            {
+                var maxWidth = Math.Max(property.Name.Length, collection.Max(item =>
+                {
+                    var value = property.GetValue(item)?.ToString() ?? string.Empty;
+                    return value.Length;
+                }));
+                columnWidths[property.Name] = maxWidth;
+            }
+
+            // Write table header
+            WriteRow(properties.Select(p => p.Name).ToArray(), columnWidths, writer);
+
+            // Write separator line
+            WriteSeparator(columnWidths, writer);
+
+            // Write table rows
+            foreach (var item in collection)
+            {
+                var rowValues = properties.Select(p => p.GetValue(item)?.ToString() ?? string.Empty).ToArray();
+                WriteRow(rowValues, columnWidths, writer);
+            }
+        }
+
+        private static void WriteRow(string[] values, Dictionary<string, int> columnWidths, TextWriter writer)
+        {
+            for (int i = 0; i < values.Length; i++)
+            {
+                writer.Write("| ");
+                writer.Write(values[i].PadRight(columnWidths.Values.ElementAt(i)));
+                writer.Write(" ");
+            }
+
+            writer.WriteLine("|");
+        }
+
+        private static void WriteSeparator(Dictionary<string, int> columnWidths, TextWriter writer)
+        {
+            foreach (var width in columnWidths.Values)
+            {
+                writer.Write("+" + new string('-', width + 2));
+            }
+
+            writer.WriteLine("+");
         }
     }
 }
