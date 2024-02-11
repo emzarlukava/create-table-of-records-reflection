@@ -12,7 +12,7 @@ namespace TableOfRecords.Tests
     public class TableOfRecordsCreatorTests
     {
         private const string path = "Table.txt";
-        
+
         [OneTimeSetUp]
         public void Setup()
         {
