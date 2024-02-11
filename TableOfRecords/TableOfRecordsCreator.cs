@@ -24,7 +24,6 @@ namespace TableOfRecords
         /// <exception cref="ArgumentException">Throw if <paramref name="collection"/> is empty.</exception>
         public static void WriteTable<T>(ICollection<T>? collection, TextWriter? writer)
         {
-            // Check for null arguments
             if (collection == null)
             {
                 throw new ArgumentNullException(nameof(collection));
@@ -35,16 +34,13 @@ namespace TableOfRecords
                 throw new ArgumentNullException(nameof(writer));
             }
 
-            // Check if collection is empty
             if (collection.Count == 0)
             {
                 throw new ArgumentException("Collection cannot be empty.", nameof(collection));
             }
 
-            // Get public properties of type T
             var properties = typeof(T).GetProperties();
 
-            // Determine maximum column width for each property
             var columnWidths = new Dictionary<string, int>();
             foreach (var property in properties)
             {
@@ -56,13 +52,10 @@ namespace TableOfRecords
                 columnWidths[property.Name] = maxWidth;
             }
 
-            // Write table header
             WriteRow(properties.Select(p => p.Name).ToArray(), columnWidths, writer);
 
-            // Write separator line
             WriteSeparator(columnWidths, writer);
 
-            // Write table rows
             foreach (var item in collection)
             {
                 var rowValues = properties.Select(p => p.GetValue(item)?.ToString() ?? string.Empty).ToArray();
